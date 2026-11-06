@@ -1,0 +1,99 @@
+version: 2
+
+# pt-plan is a Wails v3 desktop app. The Go main package (module "github.com/megaproaktiv/g-plan/src/app")
+# lives in src/app and embeds src/app/frontend/dist via //go:embed. That dist
+# directory is git-ignored and built on demand, so the "before" hooks generate
+# the Wails bindings and build the frontend before goreleaser compiles the Go
+# binary. The webview uses CGO, so only the HOST operating system is built here.
+# This produces the raw universal macOS binary only; a .app bundle (ad-hoc
+# signed), a Developer ID signed/notarized .app, and a .dmg are produced
+# separately with `wails3 package` / `wails3 task darwin:...` (see documentation/ops/release.md).
+project_name: pt-plan
+
+before:
+  hooks:
+    # Regenerate the typed Wails bindings and build the frontend into
+    # src/app/frontend/dist, which main.go embeds. Run from src/app.
+    - bash -c "cd src/app && wails3 task common:generate:bindings"
+    - bash -c "cd src/app && wails3 task common:build:frontend"
+
+builds:
+  - id: ptplan
+    dir: src/app
+    main: .
+    binary: pt-plan
+    env:
+      - CGO_ENABLED=1
+    # The macOS WebKit webview is CGO: build only for the host platform.
+    goos:
+      - darwin
+    goarch:
+      - arm64
+      - amd64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    # Desktop app: trimpath keeps builds reproducible.
+    flags:
+      - -trimpath
+    # macOS universal build pairs arm64+amd64; handled by the universal_binaries
+    # section below.
+
+universal_binaries:
+  - id: ptplan
+    replace: true
+    name_template: pt-plan
+
+archives:
+  - id: ptplan
+    ids:
+      - ptplan
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    formats:
+      - tar.gz
+    files:
+      - readme*
+      - CHANGELOG.md
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  # Use the local git log (the GitHub compare API is avoided); the curated
+  # CHANGELOG.md remains the source of truth and is set as the release body.
+  use: git
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "merge conflict"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: megaproaktiv
+    name: g-plan
+  draft: false
+  prerelease: auto
+  # Overwrite assets left by a previous (failed) run on the same release instead
+  # of failing with "already_exists" (422).
+  mode: replace
+  name_template: "pt-plan {{ .Tag }}"
+  header: |
+    ## pt-plan {{ .Tag }}
+
+    Desktop Gantt / project-plan editor (Wails v3).
+
+    The attached archive contains the macOS `pt-plan` binary (universal arm64 +
+    amd64). To build a macOS `.app` bundle yourself, run `wails3 package` in
+    `src/app` (this ad-hoc signs it). For a Developer ID signed and notarized
+    `.app` or a `.dmg`, see `documentation/ops/release.md`.

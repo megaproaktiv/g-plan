@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pt-plan application icon, FOREGROUND layer for the macOS Icon Composer bundle
+  (build/appicon.icon): two actions joined by a link. No background, no shadow,
+  no rounded square: Icon Composer applies the system shape, the indigo
+  background fill (set in icon.json), shadow and specular highlights itself.
+  The Icon Composer canvas is full-bleed, so the art of appicon.svg (an 824px
+  square on a 1024px canvas) is scaled by 1024/824 = 1.243 about the centre.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <g transform="translate(512 512) scale(1.243) translate(-512 -512)">
+    <path d="M450 350 H512 V674 H542" fill="none" stroke="#ffc233" stroke-width="22"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="534,640 576,674 534,708" fill="#ffc233" stroke="#ffc233" stroke-width="8" stroke-linejoin="round"/>
+    <rect x="230" y="290" width="220" height="120" rx="34" fill="#ffffff"/>
+    <rect x="574" y="614" width="220" height="120" rx="34" fill="#ffffff"/>
+  </g>
+</svg>

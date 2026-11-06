@@ -1,0 +1,26 @@
+
+.task
+src/app/bin
+src/app/build
+src/app/frontend/dist
+
+# local MCP / driver build artifacts (built on demand, never committed)
+src/app/mcpdrive
+src/app/ptplan-mcp
+src/app/ptplan
+src/app/frontend/node_modules
+src/app/frontend/bun.lock
+.kiro
+dist/
+
+# generated Wails binding JS (only the .ts is tracked; vite/tsc compile)
+src/app/frontend/bindings/github.com/megaproaktiv/g-plan/src/app/*.js
+
+# local tooling / session notes (never commit)
+.claude/
+memory.md
+
+# generated walkthrough manual (built from the markdown via `task` / render-manual.sh)
+documentation/walkthrough/manual.pdf
+.DS_Store
+src/app/frontend/package-lock.json

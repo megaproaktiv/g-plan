@@ -1,0 +1,55 @@
+version: '3'
+
+# Build the walkthrough manual (all markdown -> one manual.pdf).
+#
+# Rendering is OS-independent: by default it uses the pinned `pandoc/latex`
+# Docker image (reproducible on macOS/Linux/Windows, no host TeX needed) and
+# falls back to a locally installed pandoc when Docker is not running. See
+# render-manual.sh.
+#
+# Usage:
+#   task                 # same as `task manual`
+#   task manual          # auto: Docker if available, else host pandoc
+#   task manual:docker   # force the Docker engine
+#   task manual:pandoc   # force the host pandoc engine
+#   task clean           # remove manual.pdf
+
+vars:
+  OUT: "manual.pdf"
+  SOURCES:
+    sh: ls README.md [0-9]*.md 2>/dev/null
+
+tasks:
+  default:
+    desc: Build the walkthrough manual (manual.pdf)
+    cmds:
+      - task: manual
+
+  manual:
+    desc: "Render all markdown into {{.OUT}} (Docker if available, else host pandoc)"
+    sources:
+      - README.md
+      - "[0-9]*.md"
+      - "img/**"
+      - render-manual.sh
+      - circled.lua
+      - header.tex
+    generates:
+      - "{{.OUT}}"
+    cmds:
+      - ./render-manual.sh "{{.OUT}}"
+
+  manual:docker:
+    desc: "Render {{.OUT}} with the pandoc/latex Docker image (reproducible)"
+    cmds:
+      - MANUAL_ENGINE=docker ./render-manual.sh "{{.OUT}}"
+
+  manual:pandoc:
+    desc: "Render {{.OUT}} with a locally installed pandoc"
+    cmds:
+      - MANUAL_ENGINE=pandoc ./render-manual.sh "{{.OUT}}"
+
+  clean:
+    desc: "Remove the generated {{.OUT}}"
+    cmds:
+      - rm -f "{{.OUT}}"

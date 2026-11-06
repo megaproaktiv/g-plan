@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pt-plan application icon: planning in its simplest form. Two actions (white
+  bars) joined by a link (amber arrow: the second action follows the first).
+
+  FULL artwork: rounded square (824x824, centred on a 1024x1024 canvas with the
+  transparent margin macOS expects). Rendered to build/appicon.png, from which
+  the .icns and .ico are generated. The foreground-only variant for the macOS
+  Icon Composer bundle is layer.svg. Render with ./render-icon.sh.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7f7cea"/>
+      <stop offset="1" stop-color="#37338f"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="drop" x="-15%" y="-15%" width="130%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16"/>
+      <feOffset dx="0" dy="14" result="b"/>
+      <feFlood flood-color="#15124a" flood-opacity="0.50"/>
+      <feComposite in2="b" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="8" result="b"/>
+      <feFlood flood-color="#15124a" flood-opacity="0.35"/>
+      <feComposite in2="b" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#bg)" filter="url(#drop)"/>
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#gloss)"/>
+
+  <g filter="url(#soft)">
+    <!-- the link: leaves the end of action 1, drops down, enters the start of action 2 -->
+    <path d="M450 350 H512 V674 H542" fill="none" stroke="#ffc233" stroke-width="22"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="534,640 576,674 534,708" fill="#ffc233" stroke="#ffc233" stroke-width="8" stroke-linejoin="round"/>
+    <!-- action 1 and action 2 -->
+    <rect x="230" y="290" width="220" height="120" rx="34" fill="#ffffff"/>
+    <rect x="574" y="614" width="220" height="120" rx="34" fill="#ffffff"/>
+  </g>
+</svg>

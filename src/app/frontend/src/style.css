@@ -1,0 +1,167 @@
+:root { --bg:#fff; --panel:#f4f4f8; --line:#d8d8e0; --accent:#534fbc; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: #222; background: var(--bg); }
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+.toolbar { display: flex; gap: 8px; align-items: center; padding: 8px 12px;
+  border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+.toolbar h1 { font-size: 15px; margin: 0 12px 0 0; }
+
+/* One consistent button style everywhere (toolbar, dialogs, menus). */
+button, .toolbar select, .toolbar input {
+  font: inherit; padding: 6px 12px; border: 1px solid var(--line);
+  border-radius: 6px; background: #fff; cursor: pointer; line-height: 1.2; }
+button:hover { background: #f0f0f6; }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+button.primary:hover { background: #433fa0; }
+/* Disabled buttons (e.g. quick-Save when there are no unsaved changes). */
+button:disabled, button.primary:disabled {
+  opacity: 0.45; cursor: default; background: #e9e9ef; color: #999;
+  border-color: var(--line); font-weight: 400; }
+button:disabled:hover, button.primary:disabled:hover { background: #e9e9ef; }
+.spacer { flex: 1; }
+.total { font-size: 13px; color:#555; }
+
+/* right-click context menu */
+.ctxmenu { position: fixed; z-index: 50; background:#fff; border:1px solid var(--line);
+  border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 4px; display:flex; flex-direction:column; }
+.ctxmenu button { border: none; background: #fff; text-align: left; border-radius: 4px; }
+.ctxmenu button:hover { background: var(--accent); color: #fff; }
+
+.main { flex: 1; display: flex; min-height: 0; }
+.canvas-wrap { flex: 1; overflow: auto; }
+svg.gantt { display:block; }
+
+.side { width: 320px; border-left: 1px solid var(--line); overflow:auto; padding: 10px; background: var(--panel); }
+.side h2 { font-size: 13px; text-transform: uppercase; color:#666; margin: 8px 0 4px; }
+.role { background:#fff; border:1px solid var(--line); border-radius:6px; padding:6px 8px; margin-bottom:6px; }
+.role .name { font-weight:600; }
+.role .load { font-size:12px; color:#555; }
+
+.warn { color:#a40; font-size:12px; }
+#e_warn { margin-top:6px; }
+#e_warn .warn { background:#fff4e5; border:1px solid #f0c080; border-radius:4px; padding:5px 7px; margin-top:4px; }
+/* color pickers render as a square box (equal width/height) */
+input[type="color"], .editor input[type="color"] {
+  width:28px !important; height:28px; min-width:28px; padding:0;
+  border:1px solid var(--line); border-radius:4px; box-sizing:border-box; vertical-align:middle; cursor:pointer; }
+
+.chat { border-top: 1px solid var(--line); padding: 6px 12px; background: var(--panel); display:flex; gap:8px; }
+.chat input { flex:1; font: inherit; padding:6px 8px; border:1px solid var(--line); border-radius:6px; }
+.chat .log { font-size:12px; color:#555; max-height: 60px; overflow:auto; }
+
+.drill { position: fixed; inset: 40px; background:#fff; border:1px solid var(--line);
+  border-radius:10px; box-shadow:0 10px 40px rgba(0,0,0,.2); display:flex; flex-direction:column; }
+.drill header { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--line); }
+.drill .body { flex:1; overflow:auto; padding:12px 14px; }
+.drill table { width:100%; border-collapse: collapse; font-size:13px; }
+.drill th, .drill td { border:1px solid var(--line); padding:4px 6px; text-align:left; }
+.hidden { display:none; }
+.help-rel { width:100%; border-collapse:collapse; font-size:13px; }
+.help-rel th, .help-rel td { border:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+.help-rel th { background:#f4f4f8; }
+
+/* link-draw anchors: hidden until hovering the bar's group */
+svg.gantt .anchor { opacity: 0; cursor: crosshair; transition: opacity .1s; }
+svg.gantt g:hover .anchor { opacity: 1; }
+svg.gantt.linkmode { cursor: crosshair; }
+.drill textarea, .drill input { font: inherit; }
+.toolbar #link { }
+svg.gantt.linkmode .anchor { opacity: 1; }
+
+/* role filter column */
+.rolerow { display: flex; align-items: center; gap: 6px; background:#fff; border:1px solid var(--line);
+  border-radius:6px; padding:4px 6px; margin-bottom:4px; font-size:13px; }
+.rolerow .rname { flex: 1; }
+.rolerow .rload { color:#666; font-size:12px; }
+.rolerow .rolefilter { padding: 2px 8px; }
+.loadtbl { width:100%; border-collapse: collapse; font-size:11px; }
+.loadtbl th, .loadtbl td { border:1px solid var(--line); padding:2px 4px; text-align:right; }
+.loadtbl th:first-child, .loadtbl td:first-child { text-align:left; }
+.muted { color:#999; font-size:12px; }
+
+/* bottom-right selection details panel */
+.selpanel { position: absolute; right: 12px; bottom: 56px; width: 320px; max-height: 45%;
+  overflow:auto; background:#fff; border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 8px 28px rgba(0,0,0,.18); z-index: 20; }
+.selpanel header { display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid var(--line); }
+.selpanel .selbody { padding:8px 10px; font-size:13px; display:flex; flex-direction:column; gap:6px; }
+.main { position: relative; }
+
+/* inline action editor in the side panel */
+.editor { display:flex; flex-direction:column; gap:6px; background:#fff; border:1px solid var(--line);
+  border-radius:8px; padding:8px; margin-bottom:8px; font-size:13px; }
+.editor input, .editor textarea, .editor select { font: inherit; width: 100%; box-sizing: border-box; }
+.editor .erole { display:flex; gap:6px; align-items:center; margin:2px 0; }
+.editor .erole select { flex:1; }
+.editor .erole .e_pct { width: 56px; flex: 0 0 auto; }
+.editor .erow { display:flex; gap:6px; flex-wrap:wrap; }
+
+.rolename { cursor: pointer; text-decoration: underline dotted; }
+.roleedit { margin: 2px 0 8px; }
+
+/* dependency/link table in the right side panel */
+table.links { width:100%; border-collapse:collapse; font-size:12px; margin:4px 0 10px; }
+table.links th, table.links td { border:1px solid var(--line); padding:3px 6px; text-align:left; }
+table.links td button.deldep { border:none; background:none; color:#c0392b; cursor:pointer; font-size:14px; line-height:1; padding:0 4px; }
+/* add-role / remove-role-line controls in the action editor */
+.erole button.e_delrole { border:none; background:none; color:#c0392b; cursor:pointer; font-size:14px; line-height:1; padding:0 4px; }
+#e_addrole { margin-top:4px; }
+/* drill-down icon shows a drill-down (zoom-in) cursor on hover */
+.drilldown { cursor: zoom-in; }
+
+/* read-only role-capacity (fit) line below the action's roles */
+.rolefit { font-size:12px; margin-top:6px; padding:5px 7px; border-radius:4px; }
+.rolefit-ok { background:#e8f6ec; border:1px solid #9ad3ab; color:#1f7a3a; }
+.rolefit-bad { background:#fdecea; border:1px solid #f0a9a3; color:#b02a1f; }
+
+/* right-pane view/mode switcher (icons: action, role, section) */
+.modeswitch { display:flex; gap:4px; align-items:center; padding:6px 8px; border-bottom:1px solid var(--line); margin-bottom:6px; }
+.modeswitch .modeico { width:30px; height:28px; padding:0; font-size:15px; line-height:1; border:1px solid var(--line); background:#f4f4f8; border-radius:5px; cursor:pointer; }
+.modeswitch .modeico.active { background:#534fbc; color:#fff; border-color:#534fbc; }
+.modeswitch .modeico:disabled { opacity:0.45; cursor:not-allowed; }
+.headline-effort { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; }
+.headline-effort [aria-invalid="true"] { outline:2px solid #e03131; }
+
+/* monitoring */
+.sysdlg { inset: 80px 25%; z-index: 10; }
+.mon-set { border:1px solid var(--line); border-radius:6px; margin:0 0 10px; }
+.mon-bad { color:#c92a2a; } .mon-ok { color:#2b8a3e; }
+.mon-secs { list-style:none; padding:0; margin:0 0 10px; }
+.mon-secs li { display:flex; align-items:center; gap:8px; padding:2px 0; }
+.mon-dot { width:12px; height:12px; border-radius:50%; background:#adb5bd; display:inline-block; }
+.mon-green .mon-dot { background:#2f9e44; } .mon-green { font-weight:600; }
+.mon-table .num { text-align:right; font-variant-numeric: tabular-nums; }
+.mon-act td { font-size:12px; color:#444; } .mon-act td:first-child { padding-left:22px; }
+.mon-total td { font-weight:700; background:#f4f4f8; } .mon-unmatched td { color:#666; font-style:italic; }
+#mon_prog { width:220px; vertical-align:middle; }
+.mon-default td { font-style: italic; }
+.mon-busy { color:#555; font-style: italic; }
+.mon-defact td:first-child { font-weight:600; }
+.mon-parts { margin: 2px 0 6px; padding-left: 18px; font-size: 12.5px; }
+
+/* glossary help page */
+.gl-list { margin: 0 0 14px; }
+.gl-term { margin: 0 0 10px; }
+.gl-term dt { font-weight: 700; }
+.gl-also { font-weight: 400; color: #666; font-size: 12px; }
+.gl-term dd { margin: 2px 0 0 14px; font-size: 13px; line-height: 1.45; }
+.gl-example, .gl-note { margin-top: 3px; font-size: 12.5px; color: #333; }
+.headline-effort input:disabled { background:#ececf0; color:#9a9aa6; cursor:not-allowed; }
+input.ro { background:#ececf0; color:#666; cursor:not-allowed; }
+#total.dragging { color:#534fbc; font-weight:600; }
+
+/* structured help pages (monitoring guide) */
+.help-guide { max-width: 920px; line-height: 1.5; font-size: 13.5px; }
+.help-guide h3 { margin: 18px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+.help-guide code { background:#f1f1f8; border-radius:3px; padding:0 4px; font-size:12.5px; }
+.help-guide ol, .help-guide ul { padding-left: 22px; }
+.help-guide li { margin: 3px 0; }
+.help-guide .hp-intro { font-size: 14px; }
+.help-guide .hp-note { background:#f6f6fb; border-left:3px solid #534fbc; padding:6px 10px; }
+.help-guide table { margin: 6px 0 10px; }
+
+.chat { align-items: flex-end; }
+.chat textarea#batchin { flex:1; font: 13px ui-monospace, monospace; padding:6px 8px; border:1px solid var(--line); border-radius:6px; resize: vertical; }
+.chat button#batchbtn.active { background: var(--line); }
+.chat .hidden { display: none; }
