@@ -10,6 +10,7 @@
 #                                          of a release that already exists
 #   scripts/release.sh --smoke             also start the built app for a few seconds
 #   scripts/release.sh --allow-dirty       do not refuse tracked, uncommitted changes
+#   scripts/release.sh --no-windows        macOS only: skip the Windows zip
 #
 # What it does, in order:
 #   1. checks: tag exists and is pushed, HEAD is exactly that tag, the working tree is clean,
@@ -19,8 +20,11 @@
 #   3. builds the version-stamped UNIVERSAL binary (arm64 + amd64) with goreleaser
 #   4. creates ptplan.app (ad-hoc signed) and ptplan.dmg with the project's own Wails tasks
 #   5. verifies the result: architectures, version stamp, signature, icon files, dmg contents
-#   6. stages dist/release-X.Y.Z/ with the dmg, the zipped app, checksums.txt and the notes
-#      (the notes are the CHANGELOG.md section of that version)
+#   5b. cross-compiles the Windows build (pure Go, no CGo) and zips pt-plan.exe with the readme
+#      and the license; it is checked as a Windows GUI executable stamped with the version, but
+#      it is NOT run (there is no Windows here): the notes say it is untested
+#   6. stages dist/release-X.Y.Z/ with the dmg, the zipped app, the Windows zip, checksums.txt
+#      and the notes (the notes are the CHANGELOG.md section of that version)
 #   7. publishes (create, or with --republish replace) and verifies the upload by downloading
 #      the assets again and comparing their checksums
 #
@@ -31,7 +35,7 @@
 # Environment overrides: APP_COPYRIGHT, APP_COMMENTS (shown in the app's Get Info).
 set -euo pipefail
 
-TAG=""; PUBLISH=1; REPUBLISH=0; ALLOW_DIRTY=0; SMOKE=0
+TAG=""; PUBLISH=1; REPUBLISH=0; ALLOW_DIRTY=0; SMOKE=0; WINDOWS=1
 APP_COPYRIGHT="${APP_COPYRIGHT:-(c) $(date +%Y) pt-plan}"
 APP_COMMENTS="${APP_COMMENTS:-Local graphical project-plan editor}"
 
@@ -47,6 +51,7 @@ while [ $# -gt 0 ]; do
     --republish)   REPUBLISH=1; shift ;;
     --allow-dirty) ALLOW_DIRTY=1; shift ;;
     --smoke)       SMOKE=1; shift ;;
+    --no-windows)  WINDOWS=0; shift ;;
     -h|--help)     usage; exit 0 ;;
     *)             die "unknown option '$1' (see --help)" ;;
   esac
@@ -82,6 +87,7 @@ need git "install git"
 need goreleaser "brew install goreleaser"
 need wails3 "go install github.com/wailsapp/wails/v3/cmd/wails3@latest"
 for t in lipo codesign hdiutil ditto shasum plutil strings; do need "$t" "part of macOS / Xcode command line tools"; done
+[ "$WINDOWS" = 0 ] || { need zip "part of macOS"; need file "part of macOS"; need go "brew install go"; }
 [ "$PUBLISH" = 0 ] || need gh "brew install gh"
 [ -d "$BUILD" ] || die "src/app/build is missing (it is git-ignored). Run 'wails3 task common:update:build-assets' in src/app first"
 
@@ -241,6 +247,29 @@ if [ "$SMOKE" = 1 ]; then
   info "smoke test: started and reported $VERSION"
 fi
 
+# ------------------------------------------------- 5b. Windows (cross-compiled)
+WIN_ZIP="pt-plan_${VERSION}_windows_amd64.zip"
+if [ "$WINDOWS" = 1 ]; then
+  log "Cross-compiling the Windows build (not run here: untested)"
+  # Wails on Windows is pure Go (no CGo), so macOS can build it. The .syso carries the icon, the
+  # manifest and the version resource; it is removed again so it never lingers in the source tree.
+  ( cd "$APP_DIR" && quiet wails3 task windows:generate:syso ARCH=amd64 ) || die "generating the Windows resources failed"
+  WIN_DIR="$TMP/win/pt-plan_${VERSION}_windows_amd64"
+  mkdir -p "$WIN_DIR"
+  commit="$(git rev-parse --short HEAD)"; built="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  ( cd "$APP_DIR" && GOOS=windows GOARCH=amd64 CGO_ENABLED=0 quiet go build -tags production -trimpath -buildvcs=false \
+      -ldflags "-w -s -H windowsgui -X main.version=$VERSION -X main.commit=$commit -X main.date=$built" \
+      -o "$WIN_DIR/pt-plan.exe" . ) || { rm -f "$APP_DIR"/*.syso; die "the Windows build failed"; }
+  rm -f "$APP_DIR"/*.syso
+  ftype="$(file -b "$WIN_DIR/pt-plan.exe")"
+  case "$ftype" in *"PE32+"*"GUI"*"x86-64"*) ;; *) die "pt-plan.exe is not a 64-bit Windows GUI executable ($ftype)" ;; esac
+  strings "$WIN_DIR/pt-plan.exe" > "$TMP/winstrings.txt"
+  grep -qx "$VERSION" "$TMP/winstrings.txt" || die "pt-plan.exe is not stamped with version $VERSION"
+  cp readme.md LICENSE "$WIN_DIR/"
+  printf 'pt-plan %s for Windows (x64)\r\n\r\nThis build has NOT been tested on Windows yet.\r\nRun pt-plan.exe. Windows needs the WebView2 runtime (part of Windows 11 and of current\r\nMicrosoft Edge); SmartScreen may warn because the file is not signed.\r\n' "$VERSION" > "$WIN_DIR/README-windows.txt"
+  info "pt-plan.exe: $ftype, stamped $VERSION"
+fi
+
 # ----------------------------------------------------------------- 6. stage
 log "Staging the release files"
 OUT="$ROOT/dist/release-$VERSION"
@@ -249,7 +278,13 @@ ZIP="pt-plan_${VERSION}_macos_universal.app.zip"
 rm -rf "$OUT"; mkdir -p "$OUT"
 cp "$DMG_BUILT" "$OUT/$DMG"
 ditto -c -k --keepParent "$APP" "$OUT/$ZIP"
-( cd "$OUT" && shasum -a 256 "$DMG" "$ZIP" > checksums.txt )
+if [ "$WINDOWS" = 1 ]; then
+  ( cd "$TMP/win" && rm -f "$OUT/$WIN_ZIP" && zip -qr "$OUT/$WIN_ZIP" "pt-plan_${VERSION}_windows_amd64" )
+  unzip -l "$OUT/$WIN_ZIP" | grep -q "pt-plan.exe" || die "the Windows zip does not contain pt-plan.exe"
+  info "$(ls -l "$OUT/$WIN_ZIP" | awk '{print $5}') bytes  $WIN_ZIP"
+fi
+FILES=("$DMG" "$ZIP"); [ "$WINDOWS" = 0 ] || FILES+=("$WIN_ZIP")
+( cd "$OUT" && shasum -a 256 "${FILES[@]}" > checksums.txt )
 # the zip must still hold a valid, universal app
 ditto -x -k "$OUT/$ZIP" "$TMP/unzip"
 codesign --verify --deep --strict "$TMP/unzip/ptplan.app" || die "the app in the zip is not validly signed"
@@ -264,8 +299,14 @@ NOTES="$OUT/release-notes.md"
   printf '| File | Use |\n|------|-----|\n'
   printf '| `%s` | Open it and drag **ptplan** onto **Applications** |\n' "$DMG"
   printf '| `%s` | The same app as a plain zip |\n' "$ZIP"
-  printf '| `checksums.txt` | SHA-256 of both files |\n\n'
-  printf 'The app is **ad-hoc signed, not notarized**. When you first open a downloaded copy,\n'
+  printf '| `checksums.txt` | SHA-256 of all files |\n\n'
+  if [ "$WINDOWS" = 1 ]; then
+    printf '### Windows (x64) - NOT TESTED\n\n'
+    printf '`%s` holds `pt-plan.exe`. It is cross-compiled from macOS and has **not been run on Windows\n' "$WIN_ZIP"
+    printf 'yet**; expect problems and please report them. It needs the WebView2 runtime (part of\n'
+    printf 'Windows 11 and current Edge); SmartScreen may warn because the file is not signed.\n\n'
+  fi
+  printf 'The macOS app is **ad-hoc signed, not notarized**. When you first open a downloaded copy,\n'
   printf 'macOS may refuse it ("Apple cannot check it for malicious software"). Either open\n'
   printf '**System Settings > Privacy & Security** and choose **Open Anyway**, or remove the\n'
   printf 'quarantine flag once:\n\n'
@@ -281,13 +322,15 @@ fi
 
 # --------------------------------------------------------------- 7. publish
 log "Publishing $TAG to $REPO"
+UPLOAD=()
+for f in "${FILES[@]}" checksums.txt; do UPLOAD+=("$OUT/$f"); done
 if gh_ release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-  gh_ release upload "$TAG" --repo "$REPO" --clobber "$OUT/$DMG" "$OUT/$ZIP" "$OUT/checksums.txt" >/dev/null
+  gh_ release upload "$TAG" --repo "$REPO" --clobber "${UPLOAD[@]}" >/dev/null
   gh_ release edit "$TAG" --repo "$REPO" --title "pt-plan $TAG" --notes-file "$NOTES" >/dev/null
   info "replaced the assets and notes of the existing release"
 else
   gh_ release create "$TAG" --repo "$REPO" --verify-tag --title "pt-plan $TAG" \
-    --notes-file "$NOTES" "$OUT/$DMG" "$OUT/$ZIP" "$OUT/checksums.txt" >/dev/null
+    --notes-file "$NOTES" "${UPLOAD[@]}" >/dev/null
   info "created the release"
 fi
 
@@ -297,9 +340,9 @@ state="$(gh_ release view "$TAG" --repo "$REPO" --json isDraft,isPrerelease,url 
 info "$state"
 mkdir -p "$TMP/dl"
 gh_ release download "$TAG" --repo "$REPO" --pattern 'pt-plan_*' --dir "$TMP/dl" >/dev/null
-( cd "$TMP/dl" && shasum -a 256 "$DMG" "$ZIP" ) | diff - "$OUT/checksums.txt" >/dev/null \
+( cd "$TMP/dl" && shasum -a 256 "${FILES[@]}" ) | diff - "$OUT/checksums.txt" >/dev/null \
   || die "the downloaded assets do not match checksums.txt"
-for f in "$DMG" "$ZIP" checksums.txt; do
+for f in "${FILES[@]}" checksums.txt; do
   want="$(wc -c < "$OUT/$f" | tr -d ' ')"
   got="$(gh_ release view "$TAG" --repo "$REPO" --json assets --jq ".assets[] | select(.name==\"$f\") | .size")"
   [ "$want" = "$got" ] || die "asset $f has $got bytes on GitHub, expected $want"

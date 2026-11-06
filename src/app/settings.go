@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/megaproaktiv/g-plan/src/app/plan"
 )
 
 // appSettings is the on-disk shape of the global settings file.
@@ -45,7 +47,7 @@ func saveSettings(s appSettings) {
 	p := settingsPath()
 	_ = os.MkdirAll(filepath.Dir(p), 0o755)
 	if b, err := json.MarshalIndent(s, "", "  "); err == nil {
-		_ = os.WriteFile(p, b, 0o644)
+		_ = plan.WriteFileAtomic(p, b, 0o644)
 	}
 }
 

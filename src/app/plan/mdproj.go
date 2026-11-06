@@ -2,7 +2,6 @@ package plan
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -11,7 +10,7 @@ import (
 // parsed back. It exists so the plan can be read as plain text by humans
 // (including screen-reader users) and by LLMs.
 func (p *Project) WriteMarkdown(path string) error {
-	return os.WriteFile(path, []byte(p.Markdown()), 0o644)
+	return WriteFileAtomic(path, []byte(p.Markdown()), 0o644)
 }
 
 // Markdown returns the human-readable projection of the whole plan.

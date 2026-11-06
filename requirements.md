@@ -41,6 +41,29 @@ are OUTPUTS: they are never parsed back and are never the source of truth.
 R-2.1.6 New optional configuration keys MUST have defaults so that files written
 before the key existed open with the default, not a zero value.
 
+R-2.1.7 **Saving MUST be atomic.** The project file MUST be written to a
+temporary file in the same directory, flushed to disk and then moved over the
+target in one rename, so that a crash, a full disk or a power cut leaves either
+the complete old or the complete new file, never a truncated one. The previous
+content SHOULD be kept as `<file>.bak` (the backup is not a rotated version of
+R-14.4.3). A failed save MUST leave the existing file untouched and MUST be
+reported to the user. A symbolic link at the target MUST stay a link. The
+other files the app writes (`.md` projection, settings) are written the same
+way. [IMPL]
+
+R-2.1.8 **Dates are calendar dates.** A date MUST NOT depend on the time zone
+of the machine: it is a day (`YYYY-MM-DD`) without time of day, and the same
+file MUST show the same days on every computer. [PART: work-package, detail
+and dependency dates are days; the project Start/End milestones are still
+stored with a time of day and a UTC offset, and the default start of a new
+action is computed from the current UTC day. TODO: store plain dates.]
+
+R-2.1.9 **Files from newer versions.** The app MUST NOT silently lose data of
+a file written by a newer version. A file whose schema is newer than the app
+knows MUST be refused or opened read-only with a clear message; unknown keys
+of a known schema SHOULD be kept on save. [TODO: today only the schema string
+is checked.]
+
 ### 2.2 gmaid/Gmate compatibility (legacy import/export only)
 
 R-2.2.1 The serializer MUST emit only syntax gmaid accepts: `gantt` header,
@@ -216,7 +239,7 @@ no external binary) MAY be kept for legacy export only.
 
 R-10.1 The app MAY provide a chat/command bubble accepting base commands that
 mutate the plan (move/resize/add/remove/assign), mirroring the My-Memory-Master
-command bubble.
+command bubble. The command forms are specified in §14.5.
 
 R-10.2 The chat interface, if present, MUST operate on the same in-memory model
 and MUST produce the same project file and `.md` projection as the graphical
@@ -248,6 +271,15 @@ rely on float equality.
 
 R-12.4 Each epic MUST be developed on its own feature branch and merged into
 `main` only when complete.
+
+R-12.5 **Target platforms.** The app MUST run on macOS (tested) and SHOULD run
+on Windows. Windows is built (cross-compiled, no CGo) but NOT yet tested; it
+MUST NOT be described as supported until it has been tested. Linux is out of
+scope for now.
+R-12.6 **Distribution.** The macOS app is ad-hoc signed, not notarized, so
+Gatekeeper warns on other computers. Notarization with a Developer ID, and a
+signed Windows installer, are [TODO] before the app is handed to third parties.
+R-12.7 The project is published under the MIT license (`LICENSE`).
 
 ## 13. Advanced planning features (MS-Project-grade)
 
@@ -295,8 +327,11 @@ R-13.5.1 Each action MUST carry an estimated effort and a **real effort**
 (entered, or synced per §13.8). The app MUST compute the progress percentage
 from real ÷ estimated effort and show a progress marker on the bar when
 **Show Progress** is on. Detailed spec: `.kiro/specs/progress/`.
-R-13.5.2 The app SHOULD expose remaining effort = max(0, estimate − real) and
-the variance. "Duration complete" is defined in the glossary but not yet
+R-13.5.2 The monitoring result MUST show the **remaining effort** = estimated
+(tracked) − actual, per work package, per tracked action and for the project,
+as a signed value (negative = over budget), and **Remaining %** = remaining as a
+whole percent of the estimation (empty without an estimation). [IMPL in the
+Monitor table.] "Duration complete" is defined in the glossary but not yet
 displayed. [TODO]
 
 ### 13.6 Export functions — [PART]
@@ -327,6 +362,16 @@ The sync period is the project window, optionally extended by months before and
 after.
 R-13.8.4 Credentials MUST be stored outside the project file
 (`~/.pt-pm/config.yaml`, mode 0600) and MUST never be returned to the UI.
+R-13.8.2a Matching ignores case and hyphens: `WP1`, `wp1`, `WP-1` and `wp-1`
+are the same External ID, but `WP 1` (with a space) is not. Two actions MUST
+NOT carry IDs that differ only in case or hyphens.
+R-13.8.2b The **Phases** lane is a view, not a work package: monitoring MUST
+ignore it. Its actions need no External ID, do not appear in the Monitor page or
+the result table, count in no total, cannot match bookings or be the default
+action, and keep a manually entered real effort.
+R-13.8.6 The Monitor page MUST offer an **Export** of the last result as
+Markdown in two files, `<name>-compact.md` (work packages and the project sum)
+and `<name>-detailed.md` (also the tracked actions). [IMPL]
 R-13.8.5 Matching on booking attributes (not just text) and persisting the last
 sync result are [TODO].
 
@@ -334,6 +379,12 @@ sync result are [TODO].
 Done: Baselines (13.1), WBS codes (13.2), Progress (13.5), Work contours
 (13.7, display), Monitoring (13.8, Aerion). Remaining: CSV export (13.6) and
 overload view (13.4), then contour-aware load (13.7.3), then Task types (13.3).
+
+### 13.10 Working calendar — [TODO]
+R-13.10.1 The capacity checks (R-6.10, R-6.11) and the load calculations
+(R-13.4) SHOULD use a project calendar with public holidays and other
+non-working days. Today only Saturdays and Sundays count as non-working, so
+the capacity of a week with a holiday is overstated.
 
 ## 14. Implemented editor features (documented after the fact)
 
@@ -352,12 +403,17 @@ with a per-link color.
 
 ### 14.2 Sections, phases and milestones
 R-14.2.1 The section order MUST be stored explicitly, including empty sections,
-and MUST be changeable (move up/down).
+and MUST be changeable (move up/down). A new section (menu, `add section`) MUST
+be added at the END, i.e. it gets the next number: with WP-1 present the next
+one is WP-2. Existing sections keep their order.
 R-14.2.2 A locked **Phases** lane MUST always come first, without a number, and
 MAY be hidden ("Show Phases").
 R-14.2.3 Project Start and End are milestones that bound the visible window.
 R-14.2.4 Actions and details MAY be marked as a **summary** (Sammelvorgang): a
-rollup bar with a duration but no effort.
+rollup bar with a duration but no effort. Its label follows the text position
+(R-14.3.1); because the bar is only a few pixels high there is no "inside":
+`left` and `center` put the label above the bar, `up`/`down` above/below,
+`outleft` before and `outright`/auto after the bar.
 
 ### 14.3 Display options
 R-14.3.1 Per action and detail: bar color, font color (empty = automatic
@@ -366,12 +422,23 @@ sticky note at one of nine positions.
 R-14.3.2 Project-wide toggles: Show Details (with a per-action override to hide
 its detail bars), Show Progress, Show Notes, today line, and a day/week/month
 grid. The today line, grid and notes settings also apply to the report.
+R-14.3.4 The **date row** (month, day and week labels) MUST stay at the top of
+the visible area while the chart is scrolled down. The PDF/PNG export MUST show
+it at its normal place, unchanged.
+R-14.3.5 A project setting **Show week numbers** (default off) MUST write the
+ISO 8601 calendar week (`W12`, German `KW12`) at every Monday in the date row,
+but only when a week is wide enough for the label.
+R-14.3.6 While an action is moved or resized the date row MUST show a tick for
+its start and one for its end; while a milestone is moved, one tick for its
+date. The ticks disappear on release.
 R-14.3.3 Each role MUST have a distinct color; the canvas MAY be filtered by role.
 
 ### 14.4 Undo and saving
 R-14.4.1 Structural edits (add/remove/move/resize of sections, actions, details,
 dependencies) MUST be undoable (Cmd/Ctrl-Z, up to 100 steps). A batch of chat
 commands is one undo step. Redo and undo of detail reordering are [TODO].
+R-14.4.5 The app SHOULD offer **redo** (Shift-Cmd/Ctrl-Z) for every undoable
+step. [TODO]
 R-14.4.2 Deletes MUST NOT ask for confirmation; they are undoable instead.
 R-14.4.3 Autosave MUST be configurable: on/off, interval (every change or 5..99
 minutes), save on exit, and optional rotated versions (5..10 kept).
@@ -385,8 +452,17 @@ WBS numbering source (R-13.2).
 R-14.5.2 A batch mode MUST run several commands, one per line, stopping at the
 first error or at `quit`/`exit`/`stop`. Lines starting with `#` or `//` are
 comments.
-R-14.5.3 While a detail plane is open, `add` MUST create a detail of the
+R-14.5.3 `add` MUST always name what is added: `add action`, `add section`,
+`add role`, `add milestone` or `add detail`. A short `add <name>` whose meaning
+depends on the mode MUST NOT exist (it was mixed up too often); a bare `add ...`
+is refused with a hint to the full forms. While a detail plane is open,
+`add detail <name>` (and `add action <name>`) MUST create a detail of the
 drilled action.
+R-14.5.6 The form is `add action <name> [from <date>] [to <date>] [est <value>]
+[after <id>]`. `from`, `to`, `est`, `after`, `on` and `in` are **reserved
+words** that end the name; a name containing one MUST be quoted. Without dates
+an action starts today and lasts 7 days; with only `from` it lasts 7 days. A
+bad date is an error and creates nothing.
 R-14.5.4 Commands stay in English regardless of the UI language.
 
 ### 14.6 Language and help

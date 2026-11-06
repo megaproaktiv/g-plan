@@ -1,0 +1,52 @@
+gantt
+    title Rohan Phase 2 - Work Packages
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+    tickInterval 1month
+
+    section Milestones
+    Start                         :milestone, m_start, 2026-11-09, 0d
+    End of deployment             :milestone, m_deploy, 2027-07-01, 0d
+    Pilot                         :milestone, m_pilot, 2027-04-01, 0d
+    Go live                       :milestone, m_golive, 2027-08-01, 0d
+
+    section WP1<br/>Frodo
+    WP1 :wp1, 2026-11-09, 2027-08-01
+
+    section WP2<br/>Samwise
+    WP2 :wp2, 2026-12-01, 2026-12-24
+
+    section WP3<br/>Merry
+    WP3 :wp3, 2027-01-01, 2027-02-28
+
+    section WP4<br/>Pippin
+    WP4 :wp4, 2026-11-15, 2027-04-30
+
+    section WP5<br/>Aragorn
+    WP5 :wp5, 2027-04-01, 2027-05-31
+
+    section WP6<br/>Legolas
+    WP6 :wp6, 2027-03-01, 2027-05-31
+
+    section WP7<br/>Gimli
+    WP7 :wp7, 2027-02-01, 2027-04-30
+
+    section WP8<br/>Boromir
+    WP8 :wp8, 2027-03-01, 2027-06-30
+
+    section WP9<br/>Faramir
+    WP9 :wp9, 2027-06-01, 2027-06-30
+
+    section WP10<br/>Eowyn
+    WP10 :wp10, 2027-05-01, 2027-06-30
+
+    section WP11<br/>Theoden
+    WP11 :wp11, 2026-11-09, 2027-07-15
+
+    section WP12<br/>Eomer
+    WP12 :wp12, 2027-06-01, 2027-06-30
+
+    section WP13<br/>Treebeard
+    WP13 :wp13, 2027-06-30, 2027-07-31
+
+    link wp2 FS wp3

@@ -2,7 +2,6 @@ package plan
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 )
@@ -15,7 +14,7 @@ import (
 // (3-line <br/> title: "WPn", name, estimation), each with a summary bar and
 // its detail-package bars. Dependencies are emitted as `link` directives.
 func (p *Project) WriteMMD(path string) error {
-	return os.WriteFile(path, []byte(p.MMD()), 0o644)
+	return WriteFileAtomic(path, []byte(p.MMD()), 0o644)
 }
 
 // MMD returns the project serialized as a gmaid Gantt document string.

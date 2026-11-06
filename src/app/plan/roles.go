@@ -229,5 +229,5 @@ func (p *Project) SaveRoles(path string) error {
 		return err
 	}
 	b = append(b, '\n')
-	return os.WriteFile(path, b, 0o644)
+	return WriteFileAtomic(path, b, 0o644)
 }

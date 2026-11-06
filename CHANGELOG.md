@@ -6,6 +6,8 @@ follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-06
+
 ### Fixed
 
 - The text position of a **summary action** (Sammelvorgang) and of a summary detail
@@ -29,7 +31,6 @@ follow [Semantic Versioning](https://semver.org/).
   `add action <name> after <id>` replaces `add <name> :after <id>` (`:after` still
   works). In an open detail plane, `add detail <name> ...` adds a sub-action.
   The command help, the placeholder, the manual and the walkthroughs are updated.
-
 - **New sections go to the end.** "Add section" (and the chat command) appends the
   section after the existing ones, so with WP-1 present the next one is WP-2. Before,
   an empty section could land in front of the others (empty sections were ordered by
@@ -37,7 +38,6 @@ follow [Semantic Versioning](https://semver.org/).
 - **The date row stays at the top.** The month, day and week labels are fixed to the
   top of the view while the chart is scrolled down. The PDF/PNG export is unchanged:
   it always shows the date row at its normal place.
-
 - External ID recognition ignores hyphens as well as case: an action with `WP1`
   is found for `WP1`, `wp1`, `Wp1`, `WP-1` and `wp-1` (and the other way round),
   but not for `WP 1` (a space is not a hyphen). `WP1` and `WP-1` count as the same
@@ -48,6 +48,18 @@ follow [Semantic Versioning](https://semver.org/).
   match bookings or be the default action, and keep a manually entered real effort.
 
 ### Added
+
+- **Atomic saving.** The project file is written to a temporary file, flushed to disk
+  and moved over the old one in a single step, so a crash, a full disk or a power cut
+  can no longer leave a truncated project. The previous content is kept as
+  `<file>.ptplan.bak`; a failed save leaves the existing file untouched. The `.md`
+  projection, rotated versions and the app settings are written the same way.
+- **Windows build (not tested).** The release now also contains
+  `pt-plan_<version>_windows_amd64.zip` with `pt-plan.exe`. It is cross-compiled
+  (pure Go) and has never been run on Windows; the README and the release notes say so.
+- README: supported platforms (macOS tested, Windows not tested yet), a License and a
+  Support section. `requirements.md` is brought up to date (atomic save, calendar dates,
+  files from newer versions, platforms, working calendar, command bar, date row, monitoring).
 
 - `LICENSE`: the project is MIT licensed (also linked from the README and shipped in
   the release archive).

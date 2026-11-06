@@ -1,0 +1,93 @@
+gantt
+    title Rohan Phase 2 - WP4 Pippin (80 PD)
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+    tickInterval 1month
+
+    section Milestones
+    Start                         :milestone, m_start, 2026-11-09, 0d
+    End of deployment             :milestone, m_deploy, 2027-07-01, 0d
+    Pilot                         :milestone, m_pilot, 2027-04-01, 0d
+    Go live                       :milestone, m_golive, 2027-08-01, 0d
+
+    section Phases
+    0 Mobilization :ph0, 2026-11-09, 2027-01-31
+    1 Foundation and pilot :ph1, 2026-12-01, 2027-04-01
+    2 Email and chat rollout :ph2, 2027-05-01, 2027-06-30
+    3 Voice rollout :ph3, 2027-05-15, 2027-06-30
+    4 Moria exit :ph4, 2027-05-15, 2027-07-15
+
+    section WP4<br/>Pippin<br/>80 PD
+    WP4 :summary, wp4, 2026-11-15, 2027-04-30
+    Andy Serkis  :wp4_cpe,  2026-11-15, 2027-04-30
+    Hugo Weaving       :wp4_cdev, 2026-11-15, 2027-04-30
+    Elijah Wood 40 (50%)     :wp4_ai,   2026-11-15, 2027-04-30
+    Orlando Bloom 22 (28%) :wp4_ce,  2026-11-15, 2027-04-30
+    Sean Astin 18 (22%)  :wp4_cons, 2026-11-15, 2027-04-30
+    Implementation           :wp4_impl, 2026-11-15, 2027-02-28
+    &Tests                   :wp4_test, 2027-02-28, 2027-03-15
+    &Stabilization           :wp4_stab, 2027-03-15, 2027-04-30
+
+    section 01 Bilbo (A, C1)
+    01 Bilbo (A, C1) :summary, uc01, 2026-11-16, 2026-12-31
+    Stabilization 1 month :uc01_stab, 2026-11-16, 30d
+    Process :uc01_proc, 2026-11-16, 30d
+    API     :uc01_api,  2026-11-16, 30d
+
+    section 02 Galadriel (A, C1)
+    02 Galadriel (A, C1) :summary, uc02, 2026-12-01, 2026-12-24
+    Process - Andy Serkis :uc02_cpe,  2026-12-01, 2026-12-04
+    API - Hugo Weaving           :uc02_cdev, 2026-12-01, 2026-12-04
+    Finalization - Elijah Wood         :uc02_fin,  2026-12-07, 2026-12-11
+    Implementation - Orlando Bloom  :uc02_impl, 2026-12-14, 2026-12-18
+    Stabilization                      :uc02_stab, 2026-12-21, 2026-12-24
+
+    section 03 Celeborn (A, C1)
+    03 Celeborn (A, C1) :summary, uc03, 2026-12-08, 2027-01-09
+    Process - Andy Serkis :uc03_cpe,  2026-12-08, 2026-12-11
+    API - Hugo Weaving           :uc03_cdev, 2026-12-08, 2026-12-11
+    Finalization - Elijah Wood         :uc03_fin,  2026-12-15, 2026-12-18
+    Implementation - Orlando Bloom  :uc03_impl, 2026-12-21, 2026-12-24
+    Stabilization                      :uc03_stab, 2027-01-05, 2027-01-09
+
+    section 04 Elrond (C2)
+    04 Elrond (C2) :summary, uc04, 2026-12-15, 2027-02-13
+    Process - Andy Serkis :uc04_cpe,  2026-12-15, 2026-12-24
+    API - Hugo Weaving           :uc04_cdev, 2026-12-15, 2026-12-24
+    Finalization - Elijah Wood         :uc04_fin,  2027-01-05, 2027-01-16
+    Implementation - Orlando Bloom  :uc04_impl, 2027-01-19, 2027-01-30
+    Stabilization                      :uc04_stab, 2027-02-02, 2027-02-13
+
+    section 05 Arwen (A, C1)
+    05 Arwen (A, C1) :summary, uc05, 2027-01-05, 2027-02-13
+    Process - Andy Serkis :uc05_cpe,  2027-01-05, 2027-01-09
+    API - Hugo Weaving           :uc05_cdev, 2027-01-05, 2027-01-09
+    Finalization - Elijah Wood         :uc05_fin,  2027-01-19, 2027-01-23
+    Implementation - Orlando Bloom  :uc05_impl, 2027-02-02, 2027-02-06
+    Stabilization                      :uc05_stab, 2027-02-09, 2027-02-13
+
+    section 06 Haldir (A, C1)
+    06 Haldir (A, C1) :summary, uc06, 2027-01-12, 2027-02-20
+    Process - Andy Serkis :uc06_cpe,  2027-01-12, 2027-01-16
+    API - Hugo Weaving           :uc06_cdev, 2027-01-12, 2027-01-16
+    Finalization - Elijah Wood         :uc06_fin,  2027-01-26, 2027-01-30
+    Implementation - Orlando Bloom  :uc06_impl, 2027-02-09, 2027-02-13
+    Stabilization                      :uc06_stab, 2027-02-16, 2027-02-20
+
+    section 07 Denethor (A, C1)
+    07 Denethor (A, C1) :summary, uc07, 2027-01-19, 2027-02-27
+    Process - Andy Serkis :uc07_cpe,  2027-01-19, 2027-01-23
+    API - Hugo Weaving           :uc07_cdev, 2027-01-19, 2027-01-23
+    Finalization - Elijah Wood         :uc07_fin,  2027-02-02, 2027-02-06
+    Implementation - Orlando Bloom  :uc07_impl, 2027-02-16, 2027-02-20
+    Stabilization                      :uc07_stab, 2027-02-23, 2027-02-27
+
+    section 08 Gollum (A, C1)
+    08 Gollum (A, C1) :summary, uc08, 2027-01-26, 2027-03-06
+    Process - Andy Serkis :uc08_cpe,  2027-01-26, 2027-01-30
+    API - Hugo Weaving           :uc08_cdev, 2027-01-26, 2027-01-30
+    Finalization - Elijah Wood         :uc08_fin,  2027-02-09, 2027-02-13
+    Implementation - Orlando Bloom  :uc08_impl, 2027-02-23, 2027-02-27
+    Stabilization                      :uc08_stab, 2027-03-02, 2027-03-06
+
+    link wp4_test FS m_pilot

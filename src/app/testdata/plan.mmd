@@ -1,0 +1,184 @@
+gantt
+    title Rohan Phase 2 - Work Packages and Roles (367 PD)
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+    tickInterval 1month
+
+    section Milestones
+    Start                         :milestone, m_start, 2026-11-09, 0d
+    End of deployment             :milestone, m_deploy, 2027-07-01, 0d
+    Pilot                         :milestone, m_pilot, 2027-04-01, 0d
+    Go live                       :milestone, m_golive, 2027-08-01, 0d
+
+    section Phases
+    0 Mobilization :ph0, 2026-11-09, 2027-01-31
+    1 Foundation and pilot :ph1, 2026-12-01, 2027-04-01
+    2 Email and chat rollout :ph2, 2027-05-01, 2027-06-30
+    3 Voice rollout :ph3, 2027-05-15, 2027-06-30
+    4 Moria exit :ph4, 2027-05-15, 2027-07-15
+
+    section WP1<br/>Frodo<br/>40 PD
+    WP1 :summary, wp1, 2026-11-09, 2027-08-01
+    Ian McKellen 23        :wp1_lead, 2026-11-09, 2027-08-01
+    Design workshops - Viggo Mortensen 17 :wp1_arch, 2026-12-01, 2027-01-31
+
+    section WP2<br/>Samwise<br/>15 PD
+    WP2 :summary, wp2, 2026-12-01, 2026-12-24
+    Sean Astin 7,5 (50%)  :wp2_cons, 2026-12-01, 2026-12-24
+    Orlando Bloom 7,5 (50%) :wp2_ce,  2026-12-01, 2026-12-24
+
+    section WP3<br/>Merry<br/>25 PD
+    WP3 :summary, wp3, 2027-01-01, 2027-02-28
+    Viggo Mortensen 12,5 (50%) :wp3_arch, 2027-01-05, 2027-02-28
+    Orlando Bloom 12,5 (50%)  :wp3_ce,   2027-01-05, 2027-02-28
+
+    section WP4<br/>Pippin<br/>80 PD
+    WP4 :summary, wp4, 2026-11-15, 2027-04-30
+    Elijah Wood 40 (50%)     :wp4_ai,   2026-11-15, 2027-04-30
+    Orlando Bloom 22 (28%) :wp4_ce,  2026-11-15, 2027-04-30
+    Sean Astin 18 (22%)  :wp4_cons, 2026-11-15, 2027-04-30
+    Implementation           :wp4_impl, 2026-11-15, 2027-02-28
+    &Tests                   :wp4_test, 2027-02-28, 2027-03-15
+    &Stabilization           :wp4_stab, 2027-03-15, 2027-04-30
+
+    section WP5<br/>Aragorn<br/>20 PD
+    WP5 :summary, wp5, 2027-04-01, 2027-05-31
+    Viggo Mortensen 10 (50%) :wp5_arch, 2027-04-01, 2027-05-31
+    Orlando Bloom 10 (50%)  :wp5_ce,   2027-04-01, 2027-05-31
+    Implementation           :wp5_impl, 2027-04-01, 2027-05-13
+    &Tests                   :wp5_test, 2027-05-13, 2027-05-20
+    &Stabilization           :wp5_stab, 2027-05-20, 2027-05-31
+
+    section WP6<br/>Legolas<br/>46 PD
+    WP6 :summary, wp6, 2027-03-01, 2027-05-31
+    Grunddesign - Viggo Mortensen 8 :wp6_des, 2027-01-01, 2027-02-28
+    Viggo Mortensen 12,5 :wp6_arch, 2027-03-01, 2027-05-31
+    Orlando Bloom 25,5 (50%)  :wp6_ce,   2027-03-01, 2027-05-31
+    Implementation           :wp6_impl, 2027-03-01, 2027-04-26
+    &Tests                   :wp6_test, 2027-04-26, 2027-05-03
+    &Stabilization           :wp6_stab, 2027-05-03, 2027-05-31
+
+    section WP7<br/>Gimli<br/>38 PD
+    WP7 :summary, wp7, 2027-02-01, 2027-04-30
+    Orlando Bloom 28,5 (75%) :wp7_ce,   2027-02-01, 2027-04-30
+    Viggo Mortensen 7,6 (20%) :wp7_arch, 2027-02-01, 2027-04-30
+    Elijah Wood 1,9 (5%)        :wp7_ai,   2027-02-01, 2027-04-30
+    Agent Assist                :wp7_aa,   2027-02-01, 2027-03-15
+
+    section WP8<br/>Boromir<br/>15 PD
+    WP8 :summary, wp8, 2027-03-01, 2027-06-30
+    Orlando Bloom 7,5 (50%) :wp8_ce,   2027-03-01, 2027-06-30
+    Elijah Wood 6 (40%)        :wp8_ai,   2027-03-01, 2027-06-30
+    Viggo Mortensen 1,5 (10%) :wp8_arch, 2027-03-01, 2027-06-30
+    Base Boromir         :wp8_base, 2027-03-01, 2027-03-15
+
+    section WP9<br/>Faramir<br/>18 PD
+    WP9 :summary, wp9, 2027-06-01, 2027-06-30
+    Orlando Bloom 12,6 (70%) :wp9_ce,   2027-06-01, 2027-06-30
+    Viggo Mortensen 5,4 (30%) :wp9_arch, 2027-06-01, 2027-06-30
+
+    section WP10<br/>Eowyn<br/>15 PD
+    WP10 :summary, wp10, 2027-05-01, 2027-06-30
+    Orlando Bloom 7,5 (50%) :wp10_ce,   2027-05-01, 2027-06-30
+    Viggo Mortensen 7,5 (50%) :wp10_arch, 2027-05-01, 2027-06-30
+
+    section WP11<br/>Theoden<br/>30 PD
+    WP11 :summary, wp11, 2026-11-09, 2027-07-15
+    Cate Blanchett 30 :wp11_te, 2026-11-09, 2027-07-15
+
+    section WP12<br/>Eomer<br/>10 PD
+    WP12 :summary, wp12, 2027-06-01, 2027-06-30
+    Orlando Bloom 5 (50%)  :wp12_ce,   2027-06-01, 2027-06-30
+    Viggo Mortensen 5 (50%) :wp12_arch, 2027-06-01, 2027-06-30
+
+    section WP13<br/>Treebeard<br/>15 PD
+    WP13 :summary, wp13, 2027-06-30, 2027-07-31
+    Viggo Mortensen 5 :wp13_arch, 2027-06-30, 2027-07-31
+    Orlando Bloom 5  :wp13_ce,   2027-06-30, 2027-07-31
+    Elijah Wood 5       :wp13_ai,   2027-06-30, 2027-07-31
+
+    section Absence
+    No work (last week Dec - first week Jan) :crit, absence, 2026-12-25, 2027-01-04
+
+    section Gesamtkapazitaet PD (FTE p̄) [aktive Rollen]
+    14 (0,7p̄) [6] :cap_11, 2026-11-09, 2026-11-30
+    &35 (1,8p̄) [6] :cap_12, 2026-12-01, 2026-12-24
+    &33 (1,7p̄) [6] :cap_01, 2027-01-05, 2027-01-31
+    &47 (2,3p̄) [6] :cap_02, 2027-02-01, 2027-02-28
+    &59 (3,0p̄) [6] :cap_03, 2027-03-01, 2027-03-31
+    &67 (3,3p̄) [6] :cap_04, 2027-04-01, 2027-04-30
+    &44 (2,2p̄) [5] :cap_05, 2027-05-01, 2027-05-31
+    &49 (2,5p̄) [5] :cap_06, 2027-06-01, 2027-06-30
+    &19 (0,9p̄) [5] :cap_07, 2027-07-01, 2027-07-31
+
+    section Ian McKellen (23 PD)
+    2 (0,1)   :lead_11, 2026-11-09, 2026-11-30
+    &2 (0,1)  :lead_12, 2026-12-01, 2026-12-24
+    &3 (0,1)  :lead_01, 2027-01-05, 2027-01-31
+    &3 (0,1)  :lead_02, 2027-02-01, 2027-02-28
+    &3 (0,2)  :lead_03, 2027-03-01, 2027-03-31
+    &3 (0,1)  :lead_04, 2027-04-01, 2027-04-30
+    &3 (0,1)  :lead_05, 2027-05-01, 2027-05-31
+    &3 (0,1)  :lead_06, 2027-06-01, 2027-06-30
+    &1 (0,1)  :lead_07, 2027-07-01, 2027-07-31
+
+    section Viggo Mortensen (92 PD)
+    2 (0,1)   :arch_11, 2026-11-09, 2026-11-30
+    &2 (0,1)  :arch_12, 2026-12-01, 2026-12-24
+    &8 (0,4)  :arch_01, 2027-01-05, 2027-01-31
+    &11 (0,5) :arch_02, 2027-02-01, 2027-02-28
+    &12 (0,6) :arch_03, 2027-03-01, 2027-03-31
+    &17 (0,9) :arch_04, 2027-04-01, 2027-04-30
+    &18 (0,9) :arch_05, 2027-05-01, 2027-05-31
+    &17 (0,9) :arch_06, 2027-06-01, 2027-06-30
+    &6 (0,3)  :arch_07, 2027-07-01, 2027-07-31
+
+    section Orlando Bloom (143,6 PD)
+    2 (0,1)   :engc_11, 2026-11-09, 2026-11-30
+    &11 (0,6) :engc_12, 2026-12-01, 2026-12-24
+    &10 (0,5) :engc_01, 2027-01-05, 2027-01-31
+    &19 (1)   :engc_02, 2027-02-01, 2027-02-28
+    &25 (1,3) :engc_03, 2027-03-01, 2027-03-31
+    &29 (1,5) :engc_04, 2027-04-01, 2027-04-30
+    &18 (0,9) :engc_05, 2027-05-01, 2027-05-31
+    &24 (1,2) :engc_06, 2027-06-01, 2027-06-30
+    &5 (0,2)  :engc_07, 2027-07-01, 2027-07-31
+
+    section Elijah Wood (52,9 PD)
+    4 (0,2)   :ai_11, 2026-11-09, 2026-11-30
+    &6 (0,3)  :ai_12, 2026-12-01, 2026-12-24
+    &7 (0,3)  :ai_01, 2027-01-05, 2027-01-31
+    &8 (0,4)  :ai_02, 2027-02-01, 2027-02-28
+    &10 (0,5) :ai_03, 2027-03-01, 2027-03-31
+    &10 (0,5) :ai_04, 2027-04-01, 2027-04-30
+    &1 (0,1)  :ai_05, 2027-05-01, 2027-05-31
+    &2 (0,1)  :ai_06, 2027-06-01, 2027-06-30
+    &5 (0,2)  :ai_07, 2027-07-01, 2027-07-31
+
+    section Sean Astin (25,5 PD)
+    2 (0,1)   :cons_11, 2026-11-09, 2026-11-30
+    &10 (0,5) :cons_12, 2026-12-01, 2026-12-24
+    &3 (0,2)  :cons_01, 2027-01-05, 2027-01-31
+    &3 (0,2)  :cons_02, 2027-02-01, 2027-02-28
+    &4 (0,2)  :cons_03, 2027-03-01, 2027-03-31
+    &4 (0,2)  :cons_04, 2027-04-01, 2027-04-30
+
+    section Cate Blanchett (30 PD)
+    3 (0,1)   :te_11, 2026-11-09, 2026-11-30
+    &3 (0,2)  :te_12, 2026-12-01, 2026-12-24
+    &3 (0,2)  :te_01, 2027-01-05, 2027-01-31
+    &3 (0,2)  :te_02, 2027-02-01, 2027-02-28
+    &4 (0,2)  :te_03, 2027-03-01, 2027-03-31
+    &4 (0,2)  :te_04, 2027-04-01, 2027-04-30
+    &4 (0,2)  :te_05, 2027-05-01, 2027-05-31
+    &4 (0,2)  :te_06, 2027-06-01, 2027-06-30
+    &2 (0,1)  :te_07, 2027-07-01, 2027-07-31
+
+    link wp2 FS wp3
+    link wp1_arch FS wp6
+    link wp7_aa FS m_pilot
+    link wp3 FS m_pilot
+    link wp8_base FS m_pilot
+    link wp4_test FS m_pilot
+    link wp5_stab FF ph2
+    link wp6_stab FF ph3

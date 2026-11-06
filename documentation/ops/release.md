@@ -2,7 +2,8 @@
 
 pt-plan is a [Wails v3](https://v3.wails.io) desktop app. The Go main package
 (module `ptplan`) lives in `src/app` and embeds `src/app/frontend/dist`. The
-webview uses CGO, so builds are per host OS (no cross-compiling the GUI).
+macOS webview uses CGO, so the macOS app is built on a Mac. The Windows build is pure Go
+(no CGo) and is cross-compiled from macOS by `scripts/release.sh`; it is **untested**.
 
 All commands below run from `src/app` unless noted.
 
@@ -23,6 +24,7 @@ scripts/release.sh             # build, verify, publish
 | `scripts/release.sh --no-publish` | **Recreate** the package only; nothing is uploaded. The files land in `dist/release-X.Y.Z/` |
 | `scripts/release.sh --republish` | **Republish**: rebuild and replace the assets and notes of a release that already exists |
 | `scripts/release.sh --smoke` | Also start the built app for a few seconds |
+| `scripts/release.sh --no-windows` | macOS only: skip the Windows zip |
 | `scripts/release.sh --help` | Full description |
 
 It refuses to run when the tag is not pushed, HEAD is not the tag, files that go
@@ -32,7 +34,11 @@ the version (that section becomes the release notes). It builds the stamped
 universal binary (arm64 + amd64) with goreleaser, bundles `ptplan.app` and
 `ptplan.dmg` with the Wails tasks, verifies architectures, version stamp,
 signature, icon files and the dmg contents, and after uploading it downloads the
-assets again to compare checksums.
+assets again to compare checksums. Unless `--no-windows` is given it also
+cross-compiles `pt-plan.exe` (Windows x64, with icon, manifest and version resource),
+checks it is a 64-bit GUI executable stamped with the version, and ships it as
+`pt-plan_<version>_windows_amd64.zip`. It cannot run it, so the release notes mark
+the Windows build as not tested.
 
 Things worth knowing:
 

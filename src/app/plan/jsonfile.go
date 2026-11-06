@@ -192,13 +192,15 @@ func (p *Project) fromFile(f projectFile) {
 	p.Baselines = f.Baselines
 }
 
-// SaveJSON writes the whole project to a single self-contained JSON file.
+// SaveJSON writes the whole project to a single self-contained JSON file. The
+// write is atomic (see WriteFileAtomic) and keeps the previous content as
+// <file>.bak, so a failed save never destroys the existing project file.
 func (p *Project) SaveJSON(path string) error {
 	b, err := p.MarshalProject()
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, b, 0o644)
+	return WriteFileAtomicBackup(path, b, 0o644)
 }
 
 // MarshalProject returns the single-file JSON bytes for the project (used by
@@ -332,7 +334,7 @@ func RotateVersion(mainPath string, keep int) (string, error) {
 	}
 	num := nextVersionNum(mainPath)
 	vpath := fmt.Sprintf("%s%03d%s", versionPrefix(mainPath), num, ProjectFileExt)
-	if err := os.WriteFile(vpath, data, 0o644); err != nil {
+	if err := WriteFileAtomic(vpath, data, 0o644); err != nil {
 		return "", err
 	}
 	// prune oldest so the total kept does not exceed `keep`

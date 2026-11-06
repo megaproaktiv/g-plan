@@ -76,8 +76,18 @@ See [`requirements.md`](requirements.md) for the full business requirements
 - **Go + [Wails v3](https://v3.wails.io/)** — native desktop shell with a
   WebView UI. Services are bound and typed TS bindings are generated into
   `frontend/bindings`.
-- No CGo, no bundled browser. gmaid (pure Go) is an embedded package.
-- Cross-platform: macOS first, then Windows.
+- No bundled browser: the app uses the system web view. The Windows build is
+  pure Go (no CGo); the macOS build uses CGo for WebKit. gmaid (pure Go) is an
+  embedded package.
+- Target platforms: see [Supported platforms](#supported-platforms).
+
+## Supported platforms
+
+| Platform | Status |
+|---|---|
+| **macOS** (Apple Silicon and Intel) | Developed and tested. The release is a universal `.app` in a `.dmg`, ad-hoc signed and **not notarized** (macOS asks for confirmation on first start). |
+| **Windows** (x64) | Target platform, **not tested yet.** It is cross-compiled from macOS and published as a zip with `pt-plan.exe`, but nobody has run it on Windows so far. Expect problems and please report them. |
+| Linux | Not a target for now. |
 
 ## Build and run
 
@@ -107,3 +117,9 @@ Aerion). Open items are marked [TODO] / [PART] in
 ## License
 
 [MIT](LICENSE) - Copyright (c) 2026 Gernot Glawe.
+
+## Support
+
+If you want to support this work, then consider buying me a coffee.
+
+[<img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=megaproaktiv&button_colour=5F7FFF&font_colour=ffffff&font_family=Bree&outline_colour=000000&coffee_colour=FFDD00" alt="Buy me a coffee" height="48">](https://www.buymeacoffee.com/megaproaktiv)
