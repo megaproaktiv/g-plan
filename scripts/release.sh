@@ -122,13 +122,15 @@ gh_() { if [ "$GH_STRIP_ENV" = 1 ]; then env -u GITHUB_TOKEN -u GH_TOKEN gh "$@"
 if [ "$PUBLISH" = 1 ]; then
   git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1 \
     || die "tag $TAG is not pushed. Run: git push origin $TAG"
-  # A GITHUB_TOKEN in the environment wins over the stored login, and for a private repo a token
-  # without access only yields a masked 404. Use whichever login can really see the repository.
-  if gh repo view "$REPO" --json name >/dev/null 2>&1; then
-    GH_STRIP_ENV=0
-  elif env -u GITHUB_TOKEN -u GH_TOKEN gh repo view "$REPO" --json name >/dev/null 2>&1; then
+  # A GITHUB_TOKEN in the environment wins over the stored login. That token may be unable to see a
+  # private repository (masked 404) or to create releases (403, a fine-grained token without
+  # "contents: write"), so the stored login is tried FIRST and the environment token only if that
+  # fails.
+  if env -u GITHUB_TOKEN -u GH_TOKEN gh repo view "$REPO" --json name >/dev/null 2>&1; then
     GH_STRIP_ENV=1
-    info "GITHUB_TOKEN cannot see $REPO; using the stored gh login instead"
+    [ -z "${GITHUB_TOKEN:-}${GH_TOKEN:-}" ] || info "using the stored gh login (not the GITHUB_TOKEN of the environment)"
+  elif gh repo view "$REPO" --json name >/dev/null 2>&1; then
+    GH_STRIP_ENV=0
   else
     die "no GitHub login can access $REPO (try: gh auth login)"
   fi
@@ -280,7 +282,8 @@ cp "$DMG_BUILT" "$OUT/$DMG"
 ditto -c -k --keepParent "$APP" "$OUT/$ZIP"
 if [ "$WINDOWS" = 1 ]; then
   ( cd "$TMP/win" && rm -f "$OUT/$WIN_ZIP" && zip -qr "$OUT/$WIN_ZIP" "pt-plan_${VERSION}_windows_amd64" )
-  unzip -l "$OUT/$WIN_ZIP" | grep -q "pt-plan.exe" || die "the Windows zip does not contain pt-plan.exe"
+  unzip -l "$OUT/$WIN_ZIP" > "$TMP/winzip.txt"   # (a pipe into grep -q would fail with SIGPIPE under pipefail)
+  grep -q "pt-plan.exe" "$TMP/winzip.txt" || die "the Windows zip does not contain pt-plan.exe"
   info "$(ls -l "$OUT/$WIN_ZIP" | awk '{print $5}') bytes  $WIN_ZIP"
 fi
 FILES=("$DMG" "$ZIP"); [ "$WINDOWS" = 0 ] || FILES+=("$WIN_ZIP")
