@@ -103,3 +103,7 @@ with per-month load (Epic 3), and a chat command bubble with batch mode
 numbering, progress and work contours, and monitoring (sync of real effort from
 Aerion). Open items are marked [TODO] / [PART] in
 [`requirements.md`](requirements.md) §13–14.
+
+## License
+
+[MIT](LICENSE) - Copyright (c) 2026 Gernot Glawe.

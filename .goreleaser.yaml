@@ -57,6 +57,7 @@ archives:
     files:
       - readme*
       - CHANGELOG.md
+      - LICENSE
 
 checksum:
   name_template: checksums.txt

@@ -49,6 +49,9 @@ follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `LICENSE`: the project is MIT licensed (also linked from the README and shipped in
+  the release archive).
+
 - Project setup: **Show week numbers**. The ISO calendar week (W12, "KW 12" in
   German projects) is written at every Monday in the date row when a week is wide
   enough for the label. Off by default; saved with the project.

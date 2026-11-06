@@ -919,10 +919,9 @@ export class Gantt {
             }
             g.appendChild(bar);
             const sl = d.est && d.est !== "0" ? `${d.name}  ${d.est}` : d.name;
-            this.text(xR + 8, sy + barH, sl, "#333", 11, g);
+            const [hx0, hx1] = this.placeSummaryLabel(g, xL, xR, sy, barH, capH, sl, d.textPos, d.fontColor);
             // a transparent hit area over the whole block (thin spine is hard to hit)
-            const labelW = 8 + sl.length * 7 + 6;
-            const hit = this.rect(xL - 4, y, (xR - xL) + labelW + 8, ROW_H, "transparent", "", 0, g);
+            const hit = this.rect(hx0, y, hx1 - hx0, ROW_H, "transparent", "", 0, g);
             if (this.linkMode) {
                 hit.style.cursor = "crosshair";
                 hit.addEventListener("click", (e) => { e.stopPropagation(); this.handleDetailLinkClick(d.id); });
@@ -1187,14 +1186,14 @@ export class Gantt {
                 // red warning outline around the summary span
                 this.rect(xL - 1, sy - 2, w0 + 2, barH + capH + 4, "transparent", "#e03131", 2, g);
             }
-            // label to the right of the end (name + optional effort)
+            // label (name + optional effort) at the chosen text position; default:
+            // to the right of the end
             const sl = w.est && w.est !== "0" ? `${w.name}  ${w.est}` : w.name;
-            this.text(xR + 8, sy + barH, sl, "#333", 11, g);
+            const [hx0, hx1] = this.placeSummaryLabel(g, xL, xR, sy, barH, capH, sl, w.textPos, w.fontColor);
             // A summary's thin spine is hard to click, so add a transparent hit area
-            // covering the WHOLE block (the full row height across the span, plus the
-            // label to the right). This hit rect is the click/dblclick/link target.
-            const labelW = 8 + sl.length * 7 + 6;
-            const hit = this.rect(xL - 4, y, w0 + labelW + 8, ROW_H, "transparent", "", 0, g);
+            // covering the WHOLE block (the full row height across the span and the
+            // label). This hit rect is the click/dblclick/link target.
+            const hit = this.rect(hx0, y, hx1 - hx0, ROW_H, "transparent", "", 0, g);
             hit.style.cursor = this.linkMode ? "crosshair" : "pointer";
             if (this.linkMode) {
                 hit.addEventListener("click", () => this.handleLinkClick(w.id));
@@ -2253,6 +2252,49 @@ export class Gantt {
         const t = this.text(tx, ty, text, fill, size, g);
         if (anchor !== "start")
             t.setAttribute("text-anchor", anchor);
+    }
+    // placeSummaryLabel writes the label of a summary bar (Sammelvorgang) at the
+    // chosen text position and returns the horizontal extent [x0, x1] of bar plus
+    // label, for the hit area. The rollup bar is only a few pixels high, so there
+    // is no "inside": left and center put the label ABOVE the bar (left-aligned /
+    // centered), like "up". Auto (and the legacy "right") keeps it to the right.
+    placeSummaryLabel(g, xL, xR, sy, barH, capH, text, pos, explicit) {
+        const size = 11, color = explicit || "#333";
+        const tw = 8 + text.length * 7 + 6; // generous width estimate for the hit area
+        let tx = xR + 8, ty = sy + barH, anchor = "start";
+        switch (pos || "auto") {
+            case "outleft":
+                tx = xL - 8;
+                anchor = "end";
+                break;
+            case "up":
+            case "left":
+                tx = xL;
+                ty = sy - 4;
+                break;
+            case "center":
+                tx = (xL + xR) / 2;
+                ty = sy - 4;
+                anchor = "middle";
+                break;
+            case "down":
+                tx = xL;
+                ty = sy + barH + capH + size;
+                break;
+        }
+        const t = this.text(tx, ty, text, color, size, g);
+        if (anchor !== "start")
+            t.setAttribute("text-anchor", anchor);
+        let lx0 = tx, lx1 = tx + tw;
+        if (anchor === "end") {
+            lx0 = tx - tw;
+            lx1 = tx;
+        }
+        if (anchor === "middle") {
+            lx0 = tx - tw / 2;
+            lx1 = tx + tw / 2;
+        }
+        return [Math.min(xL - 4, lx0), Math.max(xR + 4, lx1)];
     }
     // measureText estimates a label's rendered width in px. SVG getComputedText-
     // Length would be exact but requires the node to be laid out; this average-
