@@ -156,6 +156,13 @@ export function ChatHelp(): $CancellablePromise<string> {
 }
 
 /**
+ * ClearRecent empties the recent-files list.
+ */
+export function ClearRecent(): $CancellablePromise<void> {
+    return $Call.ByID(4230060865);
+}
+
+/**
  * CommandHelp returns the command (CLI) help. It is ALWAYS English because the
  * command language is never translated; the `lang` arg is accepted for a
  * uniform help API but ignored for the body (only an English header).
@@ -410,12 +417,37 @@ export function OpenDialog(): $CancellablePromise<$models.ProjectDTO | null> {
 }
 
 /**
+ * OpenLastIfEnabled opens the newest existing recent file when the setting is
+ * on and no file is open yet (the startup project has no path). Returns true when a project
+ * was opened. Called once by the UI at startup; failures are silent no-ops.
+ */
+export function OpenLastIfEnabled(): $CancellablePromise<boolean> {
+    return $Call.ByID(3906454483);
+}
+
+/**
  * OpenProject loads a project from a path. A single-file .ptplan.json (or any
  * file whose bytes carry the project schema) loads directly; otherwise it
  * falls back to the legacy three-file set so old projects still open.
  */
 export function OpenProject(path: string): $CancellablePromise<$models.ProjectDTO | null> {
     return $Call.ByID(517162042, path);
+}
+
+/**
+ * OpenRecent opens one entry of the recent list. A file that no longer exists
+ * is removed from the list and reported as an error. Like Open, the caller is
+ * expected to save a dirty project first (the UI does).
+ */
+export function OpenRecent(path: string): $CancellablePromise<$models.ProjectDTO | null> {
+    return $Call.ByID(446169098, path);
+}
+
+/**
+ * RecentFiles lists the recently saved projects, newest first.
+ */
+export function RecentFiles(): $CancellablePromise<$models.RecentDTO[] | null> {
+    return $Call.ByID(1312256921);
 }
 
 /**
@@ -486,6 +518,13 @@ export function RenameSection(oldName: string, newName: string): $CancellablePro
  */
 export function RenderPNG(outPath: string, scale: number): $CancellablePromise<void> {
     return $Call.ByID(2925059132, outPath, scale);
+}
+
+/**
+ * ReopenLastEnabled reports the "reopen last project at startup" setting.
+ */
+export function ReopenLastEnabled(): $CancellablePromise<boolean> {
+    return $Call.ByID(2884633329);
 }
 
 /**
@@ -791,6 +830,13 @@ export function SetProjectDetails(name: string, description: string, start: stri
  */
 export function SetProjectRange(start: string, end: string): $CancellablePromise<$models.ProjectDTO | null> {
     return $Call.ByID(1171428957, start, end);
+}
+
+/**
+ * SetReopenLast stores the "reopen last project at startup" setting.
+ */
+export function SetReopenLast(on: boolean): $CancellablePromise<void> {
+    return $Call.ByID(558617894, on);
 }
 
 /**

@@ -25,6 +25,7 @@ export type {
     MonitorSummaryDTO,
     PhaseDTO,
     ProjectDTO,
+    RecentDTO,
     RelationshipRuleDTO,
     RoleDTO,
     RoleFitDTO,

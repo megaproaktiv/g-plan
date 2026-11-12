@@ -14,6 +14,11 @@ import (
 // appSettings is the on-disk shape of the global settings file.
 type appSettings struct {
 	LastDir string `json:"lastDir,omitempty"`
+	// RecentFiles lists the most recently SAVED project files, newest first
+	// (at most MaxRecent). Files only enter the list after a successful save.
+	RecentFiles []string `json:"recentFiles,omitempty"`
+	// ReopenLast makes the app open the newest recent file at startup.
+	ReopenLast bool `json:"reopenLast,omitempty"`
 }
 
 // settingsPath returns the path to the settings file in the OS user-config dir

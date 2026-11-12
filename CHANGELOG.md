@@ -6,6 +6,17 @@ follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-12
+
+### Added
+
+- **Open Recent:** a "▾" button next to Open lists the last 5 saved files (newest
+  first; missing files are greyed out). A file enters the list only after a save
+  (Save, Save As), not when it is merely opened or autosaved.
+- **Settings dialog** (toolbar "Settings…", system-wide, not per project): "Reopen
+  the last saved project at startup" and "Clear recent files". Stored in the
+  global `settings.json`.
+
 ## [1.3.0] - 2026-11-06
 
 ### Fixed

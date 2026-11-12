@@ -22,13 +22,14 @@ app.innerHTML = `
     <h1>pt-plan</h1>
     <button id="details">Project…</button>
     <button id="new">New</button>
-    <button id="open">Open</button>
+    <button id="open">Open</button><button id="recent" title="Open one of the last 5 saved files" aria-label="Open recent">▾</button>
     <button id="save" class="primary" title="Save to the current file (⌘S)">Save</button>
     <button id="saveas" title="Save to a new location…">Save As…</button>
     <button id="pdf">Report…</button>
     <button id="baselines">Baselines</button>
     <button id="monitor" title="Compare with real effort booked in an external system">Monitor</button>
     <button id="link">Link (L)</button>
+    <button id="settings" title="Application settings">Settings…</button>
     <span class="spacer"></span>
     <label>Unit
       <select id="unit"><option value="days">days</option><option value="hours">hours</option></select>
@@ -63,6 +64,7 @@ app.innerHTML = `
   <div class="drill hidden" id="helpbox"></div>
   <div class="drill hidden" id="projbox"></div>
   <div class="drill hidden" id="baselinebox"></div>
+  <div class="drill hidden" id="settingsbox"></div>
 `;
 
 let savedStatus: string | null = null; // the status line text while a drag shows its own
@@ -1841,6 +1843,70 @@ document.querySelector("#open")!.addEventListener("click", async () => {
   catch (err) { alert("Open failed: " + String(err)); }
 });
 
+// Open Recent: a dropdown under the "▾" button lists the last saved files
+// (newest first). Missing files are greyed out. Like Open, a dirty project is
+// saved first (must save, no discard).
+document.querySelector("#recent")!.addEventListener("click", async (ev) => {
+  const btn = ev.currentTarget as HTMLElement;
+  if (document.querySelector("#ctxmenu")) { closeContextMenu(); return; }
+  let list: { path: string; name: string; dir: string; exists: boolean }[] = [];
+  try { list = await backend.recentFiles(); } catch { list = []; }
+  closeContextMenu();
+  const menu = document.createElement("div");
+  menu.id = "ctxmenu";
+  menu.className = "ctxmenu recent";
+  const r = btn.getBoundingClientRect();
+  menu.style.left = r.left + "px";
+  menu.style.top = r.bottom + 2 + "px";
+  menu.innerHTML = list.length === 0
+    ? `<button disabled>(no recent files)</button>`
+    : list.map((f, i) =>
+        `<button data-i="${i}" ${f.exists ? "" : "disabled"} title="${esc(f.path)}"><b>${esc(f.name)}</b> <span class="muted">${esc(f.dir)}</span></button>`).join("");
+  document.body.appendChild(menu);
+  menu.querySelectorAll<HTMLButtonElement>("button[data-i]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      closeContextMenu();
+      try {
+        await saveIfDirty();
+        project = await backend.openRecent(list[Number(b.dataset.i)].path);
+        selectedActionId = selectedSectionId = null; selectedDetail = null;
+        refresh();
+      } catch (err) { alert("Open failed: " + String(err)); }
+    }));
+  setTimeout(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement)?.closest("#ctxmenu")) { closeContextMenu(); window.removeEventListener("mousedown", onDoc); }
+    };
+    window.addEventListener("mousedown", onDoc);
+  }, 0);
+});
+
+// Settings dialog: system-wide (not per project) application settings.
+document.querySelector("#settings")!.addEventListener("click", () => openSettingsDialog());
+async function openSettingsDialog() {
+  const box = document.querySelector<HTMLDivElement>("#settingsbox")!;
+  let reopen = false;
+  try { reopen = await backend.reopenLastEnabled(); } catch { reopen = false; }
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <header><strong>Settings</strong><span style="flex:1"></span>
+      <button id="setclose">Close</button></header>
+    <div class="body">
+      <p class="muted">These settings apply to the whole application, not to a single project.</p>
+      <p><label><input type="checkbox" id="s_reopen" ${reopen ? "checked" : ""}/> Reopen the last saved project at startup</label></p>
+      <p><button id="s_clearrecent">Clear recent files</button> <span class="muted" id="s_msg"></span></p>
+    </div>`;
+  box.querySelector("#setclose")!.addEventListener("click", () => box.classList.add("hidden"));
+  box.querySelector("#s_reopen")!.addEventListener("change", async (e) => {
+    try { await backend.setReopenLast((e.target as HTMLInputElement).checked); }
+    catch (err) { alert("Could not store setting: " + String(err)); }
+  });
+  box.querySelector("#s_clearrecent")!.addEventListener("click", async () => {
+    try { await backend.clearRecent(); box.querySelector("#s_msg")!.textContent = "Recent files cleared."; }
+    catch (err) { alert("Failed: " + String(err)); }
+  });
+}
+
 // saveIfDirty saves the current project when it has unsaved changes, WITHOUT a
 // dialog: to the known path, or to a Downloads fallback when never saved. This
 // is the "must save, no discard" rule used before New/Open. No-op when clean.
@@ -2036,6 +2102,8 @@ window.addEventListener("unhandledrejection", (e) => {
     return;
   }
   try {
+    // optional system setting: reopen the last saved project (silent no-op if off/missing)
+    await backend.openLastIfEnabled().catch(() => false);
     project = await backend.getProject();
   } catch (err) {
     showStatus("Step 2: getProject failed", errStr(err));

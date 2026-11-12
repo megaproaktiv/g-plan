@@ -165,3 +165,8 @@ input.ro { background:#ececf0; color:#666; cursor:not-allowed; }
 .chat textarea#batchin { flex:1; font: 13px ui-monospace, monospace; padding:6px 8px; border:1px solid var(--line); border-radius:6px; resize: vertical; }
 .chat button#batchbtn.active { background: var(--line); }
 .chat .hidden { display: none; }
+
+/* Open Recent dropdown */
+.ctxmenu.recent button { white-space: nowrap; }
+.ctxmenu.recent button:disabled { color: #999; }
+.ctxmenu.recent button:hover:not(:disabled) .muted { color: #fff; }

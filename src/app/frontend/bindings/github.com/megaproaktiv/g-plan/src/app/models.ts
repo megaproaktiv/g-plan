@@ -355,6 +355,28 @@ export interface ProjectDTO {
 }
 
 /**
+ * RecentDTO is one entry of the Open Recent menu.
+ */
+export interface RecentDTO {
+    "path": string;
+
+    /**
+     * file name without directory
+     */
+    "name": string;
+
+    /**
+     * containing directory
+     */
+    "dir": string;
+
+    /**
+     * false when the file vanished since
+     */
+    "exists": boolean;
+}
+
+/**
  * RelationshipRuleDTO is one row of the relationship-rules help table, with the
  * abbreviation + name in the requested GUI language.
  */

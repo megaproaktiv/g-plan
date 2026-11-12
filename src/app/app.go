@@ -176,6 +176,7 @@ func (a *App) SaveDialog() (*ProjectDTO, error) {
 	a.base = path
 	a.markSaved()
 	rememberDir(filepath.Dir(path))
+	rememberRecent(path)
 	return toDTO(a.project), nil
 }
 
@@ -193,6 +194,7 @@ func (a *App) SaveProject(base string) (string, error) {
 	}
 	a.base = base
 	a.markSaved()
+	rememberRecent(base)
 	return base, nil
 }
 
@@ -486,6 +488,7 @@ func (a *App) SaveSmart() (string, error) {
 	a.base = base
 	a.markSaved()
 	rememberDir(filepath.Dir(base))
+	rememberRecent(base)
 	return base, nil
 }
 
